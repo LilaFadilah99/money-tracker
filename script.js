@@ -5,6 +5,7 @@ var transactions = [
     name: "Monthly Salary",
     amount: 5000000,
     type: "income",
+    category: "salary",
     date: "2025-06-18",
   },
   {
@@ -12,6 +13,7 @@ var transactions = [
     name: "Grocery Shopping",
     amount: 250000,
     type: "expense",
+    category: "shopping",
     date: "2025-06-17",
   },
   {
@@ -19,6 +21,7 @@ var transactions = [
     name: "Gas Station",
     amount: 150000,
     type: "expense",
+    category: "transport",
     date: "2025-06-16",
   },
   {
@@ -26,9 +29,20 @@ var transactions = [
     name: "Freelance Project",
     amount: 1500000,
     type: "income",
+    category: "freelance",
     date: "2025-06-15",
   },
 ];
+
+// Format number with dots (Indonesian style)
+function formatNumberInput(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Remove dots and convert to number
+function parseFormattedNumber(str) {
+  return parseInt(str.replace(/\./g, "")) || 0;
+}
 
 // Simple function to format money
 function formatMoney(amount) {
@@ -103,12 +117,15 @@ function showTransactionHistory() {
     var transaction = sorted[i];
     var sign = transaction.type === "income" ? "+" : "-";
     var dateDisplay = transaction.date ? formatDate(transaction.date) : "Today";
+    var categoryIcon = transaction.category ? getCategoryIcon(transaction.category) : "💰";
 
     var html =
       '<div class="history-item ' +
       transaction.type +
       '-item">' +
-      '<div class="history-icon">💰</div>' +
+      '<div class="history-icon">' +
+      categoryIcon +
+      "</div>" +
       '<div class="history-info">' +
       '<h3 class="history-name">' +
       transaction.name +
@@ -135,12 +152,14 @@ function showTransactionHistory() {
 // Add new transaction
 function addTransaction() {
   var name = document.getElementById("transaction-name").value;
-  var amount = parseInt(document.getElementById("amount").value);
+  var amountInput = document.getElementById("amount").value;
+  var amount = parseFormattedNumber(amountInput);
   var type = document.querySelector('input[name="type"]:checked').value;
+  var category = document.getElementById("category").value;
   var date = document.getElementById("date").value;
 
   // basic validation
-  if (name === "" || amount <= 0) {
+  if (name === "" || amount <= 0 || category === "") {
     alert("Please fill all fields correctly!");
     return;
   }
@@ -150,6 +169,7 @@ function addTransaction() {
     name: name,
     amount: amount,
     type: type,
+    category: category,
     date: date,
   };
 
@@ -160,9 +180,15 @@ function addTransaction() {
   updateTransactionCount();
   showTransactionHistory();
 
-  // clear form
+  // clear all form fields
   document.getElementById("transaction-name").value = "";
   document.getElementById("amount").value = "";
+  document.getElementById("category").value = "";
+  document.getElementById("date").value = "";
+
+  // reset radio button to income (default)
+  document.getElementById("income").checked = true;
+  document.getElementById("expense").checked = false;
 }
 
 // Delete a transaction
@@ -197,10 +223,63 @@ document.addEventListener("DOMContentLoaded", function () {
   updateTransactionCount();
   showTransactionHistory();
 
+  // Setup form submission
   document.querySelector(".transaction-form").addEventListener("submit", function (e) {
     e.preventDefault();
     addTransaction();
   });
 
+  // Setup delete all button
   document.querySelector(".delete-all-btn").addEventListener("click", deleteAllTransactions);
+
+  // Setup amount input formatting
+  var amountInput = document.getElementById("amount");
+
+  // Only allow numbers and control keys
+  amountInput.addEventListener("keydown", function (e) {
+    // Allow: backspace, delete, tab, escape, enter
+    if (
+      [46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+      // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+      (e.keyCode === 65 && e.ctrlKey === true) ||
+      (e.keyCode === 67 && e.ctrlKey === true) ||
+      (e.keyCode === 86 && e.ctrlKey === true) ||
+      (e.keyCode === 88 && e.ctrlKey === true)
+    ) {
+      return;
+    }
+    // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || e.keyCode < 48 || e.keyCode > 57) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+    }
+  });
+
+  // Format input with dots as user types
+  amountInput.addEventListener("input", function (e) {
+    var value = e.target.value.replace(/\./g, ""); // Remove existing dots
+    if (value !== "") {
+      e.target.value = formatNumberInput(value);
+    }
+  });
 });
+
+// Category icon mapping
+var categoryIcons = {
+  // Income categories
+  salary: "💰",
+  freelance: "💼",
+  investment: "📈",
+  business: "🏢",
+  // Expense categories
+  food: "🍕",
+  transport: "🚗",
+  shopping: "🛒",
+  bills: "📱",
+  entertainment: "🎬",
+  health: "🏥",
+};
+
+// Get icon for category, fallback to generic icon
+function getCategoryIcon(category) {
+  return categoryIcons[category] || "💰";
+}
