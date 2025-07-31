@@ -1,5 +1,5 @@
 // Store our transactions in a simple array
-var transactions = [
+let transactions = [
   {
     id: 1,
     name: "Monthly Salary",
@@ -51,8 +51,8 @@ function formatMoney(amount) {
 
 // Calculate total income
 function getTotalIncome() {
-  var total = 0;
-  for (var i = 0; i < transactions.length; i++) {
+  let total = 0;
+  for (let i = 0; i < transactions.length; i++) {
     if (transactions[i].type === "income") {
       total += transactions[i].amount;
     }
@@ -78,9 +78,9 @@ function getTotalBalance() {
 
 // Update the money cards on screen
 function updateMoneyCards() {
-  var income = getTotalIncome();
-  var expense = getTotalExpense();
-  var balance = getTotalBalance();
+  let income = getTotalIncome();
+  let expense = getTotalExpense();
+  let balance = getTotalBalance();
 
   document.querySelector(".income .card-amount").textContent = formatMoney(income);
   document.querySelector(".expense .card-amount").textContent = formatMoney(expense);
@@ -89,13 +89,13 @@ function updateMoneyCards() {
 
 // Update transaction count
 function updateTransactionCount() {
-  var count = transactions.length;
+  let count = transactions.length;
   document.querySelector(".counter-value").textContent = count;
 }
 
 // Simple function to format date for display
 function formatDate(dateString) {
-  var date = new Date(dateString);
+  let date = new Date(dateString);
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -105,21 +105,21 @@ function formatDate(dateString) {
 
 // Show transaction history
 function showTransactionHistory() {
-  var container = document.querySelector(".history-list");
+  let container = document.querySelector(".history-list");
   container.innerHTML = "";
 
   // sort by newest first
-  var sorted = transactions.slice().sort(function (a, b) {
+  let sorted = transactions.slice().sort(function (a, b) {
     return b.id - a.id;
   });
 
-  for (var i = 0; i < sorted.length; i++) {
-    var transaction = sorted[i];
-    var sign = transaction.type === "income" ? "+" : "-";
-    var dateDisplay = transaction.date ? formatDate(transaction.date) : "Today";
-    var categoryIcon = transaction.category ? getCategoryIcon(transaction.category) : "💰";
+  for (let i = 0; i < sorted.length; i++) {
+    let transaction = sorted[i];
+    let sign = transaction.type === "income" ? "+" : "-";
+    let dateDisplay = transaction.date ? formatDate(transaction.date) : "Today";
+    let categoryIcon = transaction.category ? getCategoryIcon(transaction.category) : "💰";
 
-    var html =
+    let html =
       '<div class="history-item ' +
       transaction.type +
       '-item">' +
@@ -151,12 +151,12 @@ function showTransactionHistory() {
 
 // Add new transaction
 function addTransaction() {
-  var name = document.getElementById("transaction-name").value;
-  var amountInput = document.getElementById("amount").value;
-  var amount = parseFormattedNumber(amountInput);
-  var type = document.querySelector('input[name="type"]:checked').value;
-  var category = document.getElementById("category").value;
-  var date = document.getElementById("date").value;
+  let name = document.getElementById("transaction-name").value;
+  let amountInput = document.getElementById("amount").value;
+  let amount = parseFormattedNumber(amountInput);
+  let type = document.querySelector('input[name="type"]:checked').value;
+  let category = document.getElementById("category").value;
+  let date = document.getElementById("date").value;
 
   // basic validation
   if (name === "" || amount <= 0 || category === "") {
@@ -164,7 +164,7 @@ function addTransaction() {
     return;
   }
 
-  var newTransaction = {
+  let newTransaction = {
     id: transactions.length + 1,
     name: name,
     amount: amount,
@@ -194,7 +194,7 @@ function addTransaction() {
 // Delete a transaction
 function deleteTransaction(id) {
   if (confirm("Are you sure you want to delete this transaction?")) {
-    for (var i = 0; i < transactions.length; i++) {
+    for (let i = 0; i < transactions.length; i++) {
       if (transactions[i].id === id) {
         transactions.splice(i, 1);
         break;
@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".delete-all-btn").addEventListener("click", deleteAllTransactions);
 
   // Setup amount input formatting
-  var amountInput = document.getElementById("amount");
+  let amountInput = document.getElementById("amount");
 
   // Only allow numbers and control keys
   amountInput.addEventListener("keydown", function (e) {
@@ -256,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Format input with dots as user types
   amountInput.addEventListener("input", function (e) {
-    var value = e.target.value.replace(/\./g, ""); // Remove existing dots
+    let value = e.target.value.replace(/\./g, ""); // Remove existing dots
     if (value !== "") {
       e.target.value = formatNumberInput(value);
     }
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Category icon mapping
-var categoryIcons = {
+let categoryIcons = {
   // Income categories
   salary: "💰",
   freelance: "💼",
